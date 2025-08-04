@@ -1,14 +1,7 @@
 import axios from "axios";
 
-// In development, use relative URLs (proxied by Vite)
-// In production, use the full URL from environment variable
-const API_BASE_URL = import.meta.env.DEV
-  ? ""
-  : import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-
 // Create axios instance with default config
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
   timeout: 300000, // 5 minutes timeout for large files
   headers: {
     "Content-Type": "application/json",
@@ -102,5 +95,5 @@ export const sendChatMessage = async (
 
 // Get PDF URL
 export const getPDFUrl = (filename) => {
-  return `${API_BASE_URL}/uploads/${filename}`;
+  return `/uploads/${filename}`;
 };
