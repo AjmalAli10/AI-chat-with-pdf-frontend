@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* PDF viewer custom styles */
+.react-pdf__Page {
+  margin: 0 auto;
+}
+
+.react-pdf__Page__canvas {
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* PDF container with proper scroll support */
+.pdf-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Standard PDF canvas width */
+.pdf-canvas {
+  min-width: 800px;
+  height: auto;
+}
+
+/* Smooth horizontal scrolling */
+.pdf-scroll-container {
+  scroll-behavior: smooth;
+  min-width: 0;
+}
+
+/* Ensure PDF content can scroll properly */
+.pdf-content-wrapper {
+  min-width: 800px;
+  overflow-x: auto;
+}
