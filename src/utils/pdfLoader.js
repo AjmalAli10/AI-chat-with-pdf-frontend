@@ -19,32 +19,17 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // Debug environment detection
-      log(
-        `Environment detection: DEV=${import.meta.env.DEV}, PROD=${
-          import.meta.env.PROD
-        }`
-      );
-      log(`Current URL: ${window.location.href}`);
-
-      // Use different strategies for dev vs prod
-      if (import.meta.env.DEV) {
-        // Development: use local file from public directory
-        const workerSrc = "/pdf.worker.min.js";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        log(`PDF worker configured for development: ${workerSrc}`);
-      } else {
-        // Production: use reliable CDN
-        const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        log(`PDF worker configured for production: ${workerSrc}`);
-      }
+      // Use local file approach - works reliably in both dev and prod
+      // The file is copied to dist during build process
+      const workerSrc = "/pdf.worker.min.js";
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+      log(`PDF worker configured: ${workerSrc}`);
 
       pdfWorkerConfigured = true;
       log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
-      // Try alternative CDN if first approach fails
+      // Try alternative approach if local file fails
       try {
         const fallbackSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
         pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
