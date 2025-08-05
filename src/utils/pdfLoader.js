@@ -19,12 +19,23 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // Configure PDF.js worker to use local worker
+      // The worker file is in the public directory and will be served from the root
       pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
       pdfWorkerConfigured = true;
-      log("PDF worker configured with local source");
+      log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
+      // Fallback to CDN if local configuration fails
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        pdfWorkerConfigured = true;
+        log("PDF worker configured with CDN fallback");
+      } catch (fallbackError) {
+        log(
+          "PDF worker CDN fallback also failed: " + fallbackError.message,
+          "error"
+        );
+      }
     }
   }
 };
