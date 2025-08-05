@@ -19,22 +19,22 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // Use local file approach - works reliably in both dev and prod
-      // The file is copied to dist during build process
-      const workerSrc = "/pdf.worker.min.js";
+      // Use jsDelivr CDN - more reliable than other CDNs
+      // This is a widely used approach that works consistently
+      const workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
       pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-      log(`PDF worker configured: ${workerSrc}`);
+      log(`PDF worker configured with jsDelivr: ${workerSrc}`);
 
       pdfWorkerConfigured = true;
       log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
-      // Try alternative approach if local file fails
+      // Try alternative CDN if jsDelivr fails
       try {
-        const fallbackSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+        const fallbackSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
         pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
         pdfWorkerConfigured = true;
-        log(`PDF worker configured with jsdelivr fallback: ${fallbackSrc}`);
+        log(`PDF worker configured with unpkg fallback: ${fallbackSrc}`);
       } catch (fallbackError) {
         log(
           "PDF worker fallback also failed: " + fallbackError.message,
