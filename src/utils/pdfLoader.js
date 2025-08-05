@@ -19,19 +19,26 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // Use jsDelivr CDN - more reliable than other CDNs
-      // This is a widely used approach that works consistently
-      const workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
-      pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-      log(`PDF worker configured with jsDelivr: ${workerSrc}`);
+      // Use different strategies for dev vs prod
+      if (import.meta.env.DEV) {
+        // Development: use local file from public directory
+        const workerSrc = "/pdf.worker.min.mjs";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for development: ${workerSrc}`);
+      } else {
+        // Production: use jsDelivr CDN with the correct file name (mjs format)
+        const workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for production: ${workerSrc}`);
+      }
 
       pdfWorkerConfigured = true;
       log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
-      // Try alternative CDN if jsDelivr fails
+      // Try alternative CDN if first approach fails
       try {
-        const fallbackSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+        const fallbackSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
         pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
         pdfWorkerConfigured = true;
         log(`PDF worker configured with unpkg fallback: ${fallbackSrc}`);

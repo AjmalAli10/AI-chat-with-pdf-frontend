@@ -27,8 +27,8 @@ const copyPDFWorkerPlugin = () => {
     generateBundle(options, bundle) {
       // Copy PDF.js worker files to the output directory
       const pdfWorkerFiles = [
-        "node_modules/pdfjs-dist/build/pdf.worker.min.js",
-        "node_modules/pdfjs-dist/build/pdf.worker.min.js.map",
+        "node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
+        "node_modules/pdfjs-dist/build/pdf.worker.min.mjs.map",
       ];
 
       pdfWorkerFiles.forEach((filePath) => {
