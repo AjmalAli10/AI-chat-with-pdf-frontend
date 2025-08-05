@@ -2,10 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import LoadingSpinner from "./LoadingSpinner";
 import { logPDFError, validatePDFUrl } from "../utils/pdfDebug";
-import { configurePDFWorker } from "../utils/pdfLoader";
-
-// Configure PDF worker on component mount
-configurePDFWorker();
 
 // Production-aware logging
 const log = (message, type = "log") => {

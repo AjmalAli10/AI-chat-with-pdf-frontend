@@ -19,24 +19,46 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // Try local file first (works with improved Vercel config), fallback to CDN
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+      // Debug environment detection
+      log(
+        `Environment detection: DEV=${import.meta.env.DEV}, PROD=${
+          import.meta.env.PROD
+        }`
+      );
+      log(`Current URL: ${window.location.href}`);
+
+      // Force configure the worker before any PDF operations
+      if (import.meta.env.DEV) {
+        // Development: use local file from public directory
+        const workerSrc = "/pdf.worker.min.js";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for development: ${workerSrc}`);
+      } else {
+        // Production: use CDN to avoid static file serving issues
+        const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for production: ${workerSrc}`);
+      }
       pdfWorkerConfigured = true;
-      log("PDF worker configured with local file");
+      log("PDF worker configured successfully");
     } catch (error) {
-      log("PDF worker local file failed: " + error.message, "error");
-      // Fallback to CDN if local file fails
+      log("PDF worker configuration failed: " + error.message, "error");
+      // Fallback to local file if CDN fails
       try {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        const fallbackSrc = "/pdf.worker.min.js";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
         pdfWorkerConfigured = true;
-        log("PDF worker configured with CDN fallback");
+        log(`PDF worker configured with local file fallback: ${fallbackSrc}`);
       } catch (fallbackError) {
         log(
-          "PDF worker CDN fallback also failed: " + fallbackError.message,
+          "PDF worker local file fallback also failed: " +
+            fallbackError.message,
           "error"
         );
       }
     }
+  } else if (pdfWorkerConfigured) {
+    log("PDF worker already configured, skipping");
   }
 };
 
