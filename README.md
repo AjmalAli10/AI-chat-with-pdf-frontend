@@ -58,6 +58,97 @@ A modern, responsive React frontend for chatting with PDF documents. Built with 
 5. **Open your browser**
    Navigate to `http://localhost:5173`
 
+## 🔧 Backend Setup
+
+This frontend requires a backend API to function. You have two options:
+
+### Option 1: Use the Deployed Backend
+
+The frontend is configured to work with the deployed backend at:
+
+```
+https://ai-chat-with-pdf-backend.vercel.app
+```
+
+### Option 2: Run Backend Locally
+
+1. **Clone the backend repository**
+
+   ```bash
+   git clone https://github.com/yourusername/ai-chat-with-pdf-backend.git
+   cd ai-chat-with-pdf-backend
+   ```
+
+2. **Install backend dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up backend environment variables**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+4. **Start the backend server**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Update frontend environment**
+   ```bash
+   # In the frontend directory, update .env
+   echo "VITE_API_BASE_URL=http://localhost:3000" > .env
+   ```
+
+## 📖 Usage
+
+### Getting Started
+
+1. **Upload a PDF**: Drag and drop a PDF file onto the upload area or click to browse
+2. **Wait for Processing**: The system will analyze your document and extract key information
+3. **Start Chatting**: Ask questions about your PDF content using natural language
+4. **View Document**: Use the PDF viewer to navigate through pages while chatting
+
+### Features Guide
+
+#### PDF Upload
+
+- **Supported Formats**: PDF files only
+- **File Size**: Up to 10MB (configurable)
+- **Processing**: Automatic document analysis and chunking
+- **Progress**: Real-time upload progress with cancel option
+
+#### Chat Interface
+
+- **Context-Aware**: AI understands your PDF content
+- **Real-time**: Instant responses with typing indicators
+- **History**: Chat history is maintained during your session
+- **Suggestions**: Get AI-generated question suggestions
+
+#### PDF Viewer
+
+- **Zoom Controls**: Use mouse wheel or zoom buttons
+- **Navigation**: Page-by-page navigation with thumbnails
+- **Responsive**: Adapts to different screen sizes
+- **Performance**: Optimized rendering for large documents
+
+### Example Conversations
+
+```
+User: "What are the main topics covered in this document?"
+AI: "Based on the document, the main topics covered are..."
+
+User: "Can you summarize the key findings?"
+AI: "Here's a summary of the key findings..."
+
+User: "What does the document say about [specific topic]?"
+AI: "According to the document, [specific topic] is discussed in..."
+```
+
 ## 🏗️ Project Structure
 
 ```
@@ -89,6 +180,18 @@ src/
 
 ## 🔧 Configuration
 
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# API Configuration
+VITE_API_BASE_URL=https://ai-chat-with-pdf-backend.vercel.app
+
+# Optional: Debug mode
+VITE_DEBUG_MODE=false
+```
+
 ### Development vs Production
 
 - **Development**: Uses Vite proxy to avoid CORS issues
@@ -118,10 +221,10 @@ src/
 
 The app can be deployed to any static hosting platform:
 
-- Netlify
-- GitHub Pages
-- AWS S3 + CloudFront
-- Firebase Hosting
+- **Netlify**: Connect your GitHub repo and set environment variables
+- **GitHub Pages**: Use GitHub Actions for deployment
+- **AWS S3 + CloudFront**: Manual deployment with CDN
+- **Firebase Hosting**: Use Firebase CLI for deployment
 
 ## 🛠️ Development
 
