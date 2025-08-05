@@ -2,9 +2,23 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import LoadingSpinner from "./LoadingSpinner";
 import { logPDFError, validatePDFUrl } from "../utils/pdfDebug";
+import { configurePDFWorker } from "../utils/pdfLoader";
 
-// Configure PDF.js worker to use local worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+// Configure PDF worker on component mount
+configurePDFWorker();
+
+// Production-aware logging
+const log = (message, type = "log") => {
+  if (import.meta.env.PROD) {
+    // Only log errors in production
+    if (type === "error") {
+      console.error(message);
+    }
+  } else {
+    // Log everything in development
+    console[type](message);
+  }
+};
 
 const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
   const [pdfDocument, setPdfDocument] = useState(null);
@@ -56,7 +70,7 @@ const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
 
         setLoading(false);
       } catch (error) {
-        console.error("Failed to load PDF:", error);
+        log("Failed to load PDF: " + error.message, "error");
         logPDFError(error, "PDFDocument.loadPDF");
         setError(error);
         setLoading(false);
@@ -75,13 +89,16 @@ const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
     const canvas = canvasRefs.current[canvasKey];
 
     if (!canvas) {
-      console.warn(`Canvas not available for page ${pageNumber}`);
+      log(
+        `Canvas not available for page ${pageNumber} - this should not happen with the retry mechanism`,
+        "warn"
+      );
       return null;
     }
 
     const context = canvas.getContext("2d");
     if (!context) {
-      console.error(`Failed to get canvas context for page ${pageNumber}`);
+      log(`Failed to get canvas context for page ${pageNumber}`, "error");
       return null;
     }
 
@@ -122,7 +139,7 @@ const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
         height: viewport.height,
       };
     } catch (error) {
-      console.error(`Failed to render page ${pageNumber}:`, error);
+      log(`Failed to render page ${pageNumber}: ${error.message}`, "error");
       return null;
     }
   }, []);
@@ -141,11 +158,31 @@ const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
         const totalPages = pdfDocument.numPages;
         const pages = [];
 
+        // Wait for canvas elements to be created in the DOM
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
         // Render pages sequentially to avoid memory issues
         for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
           try {
-            // Wait a bit for canvas to be available
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            // Wait for canvas to be available
+            let retries = 0;
+            const maxRetries = 10;
+
+            while (
+              !canvasRefs.current[`page-${pageNumber}`] &&
+              retries < maxRetries
+            ) {
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              retries++;
+            }
+
+            if (!canvasRefs.current[`page-${pageNumber}`]) {
+              log(
+                `Canvas for page ${pageNumber} not available after ${maxRetries} retries`,
+                "warn"
+              );
+              continue;
+            }
 
             const page = await pdfDocument.getPage(pageNumber);
             const renderedPage = await renderPage(page, pageNumber);
@@ -156,14 +193,14 @@ const PDFDocument = ({ pdfUrl, onDocumentLoadSuccess, onLoadError }) => {
               setRenderedPages((prev) => [...prev, renderedPage]);
             }
           } catch (error) {
-            console.error(`Failed to render page ${pageNumber}:`, error);
+            log(`Failed to render page ${pageNumber}:`, "error");
             logPDFError(error, `PDFDocument.renderPage-${pageNumber}`);
           }
         }
 
         isRenderingRef.current = false;
       } catch (error) {
-        console.error("Failed to render PDF pages:", error);
+        log("Failed to render PDF pages:", "error");
         logPDFError(error, "PDFDocument.renderAllPages");
         setError(error);
         isRenderingRef.current = false;

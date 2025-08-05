@@ -1,53 +1,66 @@
 // PDF debugging utilities
 
+// Production-aware logging
+const log = (message, type = "log") => {
+  if (import.meta.env.PROD) {
+    // Only log errors in production
+    if (type === "error") {
+      console.error(message);
+    }
+  } else {
+    // Log everything in development
+    console[type](message);
+  }
+};
+
 export const enablePDFDebug = () => {
   if (typeof window !== "undefined") {
     localStorage.debug = "pdf:*";
-    console.log("PDF debugging enabled");
+    log("PDF debugging enabled");
   }
 };
 
 export const disablePDFDebug = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("debug");
-    console.log("PDF debugging disabled");
+    log("PDF debugging disabled");
   }
 };
 
 export const logPDFError = (error, context = "") => {
-  console.error(`PDF Error${context ? ` (${context})` : ""}:`, error);
+  log(`PDF Error${context ? ` (${context})` : ""}: ${error.message}`, "error");
 
   // Log additional details for common errors
   if (error.name === "InvalidPDFException") {
-    console.error("The PDF file appears to be corrupted or invalid");
+    log("The PDF file appears to be corrupted or invalid", "error");
   } else if (error.name === "MissingPDFException") {
-    console.error("The PDF file could not be found or accessed");
+    log("The PDF file could not be found or accessed", "error");
   } else if (error.name === "UnexpectedResponseException") {
-    console.error("The server returned an unexpected response");
+    log("The server returned an unexpected response", "error");
   }
 };
 
 export const validatePDFUrl = (url) => {
   if (!url) {
-    console.warn("PDF URL is empty or null");
+    log("PDF URL is empty or null", "warn");
     return false;
   }
 
   if (typeof url !== "string") {
-    console.warn("PDF URL is not a string:", typeof url);
+    log("PDF URL is not a string: " + typeof url, "warn");
     return false;
   }
 
   if (url.startsWith("blob:")) {
-    console.log("PDF URL is a blob URL");
+    log("PDF URL is a blob URL");
     return true;
   }
 
   if (url.startsWith("http")) {
-    console.log("PDF URL is an HTTP URL");
+    log("PDF URL is an HTTP URL");
     return true;
   }
 
-  console.warn("PDF URL format not recognized:", url);
+  log("PDF URL format not recognized: " + url, "warn");
   return false;
 };

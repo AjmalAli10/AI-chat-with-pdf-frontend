@@ -3,14 +3,28 @@ import * as pdfjsLib from "pdfjs-dist";
 
 let pdfWorkerConfigured = false;
 
+// Production-aware logging
+const log = (message, type = "log") => {
+  if (import.meta.env.PROD) {
+    // Only log errors in production
+    if (type === "error") {
+      console.error(message);
+    }
+  } else {
+    // Log everything in development
+    console[type](message);
+  }
+};
+
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
       // Configure PDF.js worker to use local worker
       pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
       pdfWorkerConfigured = true;
+      log("PDF worker configured with local source");
     } catch (error) {
-      console.warn("PDF worker configuration failed:", error);
+      log("PDF worker configuration failed: " + error.message, "error");
     }
   }
 };

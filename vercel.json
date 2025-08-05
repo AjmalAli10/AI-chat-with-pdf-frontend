@@ -9,23 +9,8 @@
       "destination": "https://ai-chat-with-pdf-backend.vercel.app/uploads/:path*"
     }
   ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    }
-  ]
+  "env": {
+    "NODE_ENV": "production",
+    "VITE_NODE_ENV": "production"
+  }
 }
