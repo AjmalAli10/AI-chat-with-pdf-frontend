@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import PDFUpload from "./components/PDFUpload";
 import MainLayout from "./components/MainLayout";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { getPDFUrl } from "./services/apiService";
+
 import "./App.css";
 
 function App() {
   const [currentPDF, setCurrentPDF] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
-  const handleUploadSuccess = (fileId, fileName) => {
+  const handleUploadSuccess = (fileId, fileName, blobUrl) => {
     setCurrentPDF(fileId);
-    const url = getPDFUrl(fileName);
+    // Use blobUrl from response
+    const url = blobUrl;
     setPdfUrl(url);
   };
 
@@ -30,9 +31,9 @@ function App() {
             pdfUrl={pdfUrl}
             fileId={currentPDF}
             onUploadNew={handleUploadNew}
-            onUploadSuccess={(fileId, fileName) => {
+            onUploadSuccess={(fileId, fileName, blobUrl) => {
               setCurrentPDF(fileId);
-              const url = getPDFUrl(fileName);
+              const url = blobUrl;
               setPdfUrl(url);
             }}
           />

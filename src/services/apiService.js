@@ -38,6 +38,9 @@ export const uploadPDF = async (file, onProgress, signal = null) => {
     // Set progress to 100% to indicate upload completion
     onProgress(100);
 
+    // The response should contain:
+    // - success: boolean
+    // - data: { fileId, blobUrl, originalName, documentType, totalPages, sections, chunks, summary, suggestions }
     return response.data;
   } catch (error) {
     console.error("Upload error details:", {
@@ -93,7 +96,4 @@ export const sendChatMessage = async (
   }
 };
 
-// Get PDF URL
-export const getPDFUrl = (filename) => {
-  return `/uploads/${filename}`;
-};
+

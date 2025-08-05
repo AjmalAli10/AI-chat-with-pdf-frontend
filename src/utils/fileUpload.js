@@ -9,14 +9,25 @@ export const handleFileUpload = async (file, onProgress, signal) => {
     console.log("Upload response:", response);
 
     // Check if response has the expected structure
-    if (response && (response.success || response.fileId)) {
-      const fileId = response.fileId || response.data?.fileId;
-      const fileName = response.fileName || response.data?.fileName;
+    if (response && response.success) {
+      const fileId = response.data?.fileId;
+      const blobUrl = response.data?.blobUrl;
 
-      if (fileId && fileName) {
-        return { success: true, fileId, fileName };
+      if (fileId && blobUrl) {
+        return {
+          success: true,
+          fileId,
+          blobUrl,
+          originalName: response.data?.originalName,
+          documentType: response.data?.documentType,
+          totalPages: response.data?.totalPages,
+          sections: response.data?.sections,
+          chunks: response.data?.chunks,
+          summary: response.data?.summary,
+          suggestions: response.data?.suggestions,
+        };
       } else {
-        throw new Error("Invalid response format - missing fileId or fileName");
+        throw new Error("Invalid response format - missing fileId or blobUrl");
       }
     } else {
       throw new Error(response?.message || "Upload failed");

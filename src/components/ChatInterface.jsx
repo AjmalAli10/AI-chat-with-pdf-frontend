@@ -31,8 +31,8 @@ const ChatInterface = memo(
       }
     };
 
-    const handleUploadSuccess = (fileId, fileName) => {
-      onUploadSuccess(fileId, fileName);
+    const handleUploadSuccess = (fileId, fileName, blobUrl) => {
+      onUploadSuccess(fileId, fileName, blobUrl);
     };
 
     return (

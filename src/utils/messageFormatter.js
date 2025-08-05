@@ -86,3 +86,29 @@ export const formatMessageContent = (content, isUser) => {
 
   return formattedContent;
 };
+
+export const formatDocumentInfo = (documentData) => {
+  const info = [];
+
+  if (documentData.totalPages) {
+    info.push(`${documentData.totalPages} pages`);
+  }
+
+  if (documentData.sections) {
+    info.push(`${documentData.sections} sections`);
+  }
+
+  if (documentData.chunks) {
+    info.push(`${documentData.chunks} chunks`);
+  }
+
+  return info.join(", ");
+};
+
+export const formatSuggestions = (suggestions) => {
+  if (!suggestions || suggestions.length === 0) {
+    return null;
+  }
+
+  return suggestions.join(", ");
+};

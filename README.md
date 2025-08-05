@@ -16,6 +16,8 @@ A modern, responsive React frontend for chatting with PDF documents. Built with 
 - **🎨 Modern UI**: Clean, intuitive interface with Tailwind CSS
 - **🔄 Real-time Updates**: Live chat with typing indicators and progress tracking
 - **📊 File Management**: Upload, view, and manage multiple PDF documents
+- **🔗 Blob Storage**: Uses Vercel Blob Storage for file handling
+- **📈 Progress Tracking**: Real-time upload progress with abort capability
 
 ## 🚀 Quick Start
 
@@ -72,8 +74,7 @@ src/
 │   ├── TypingIndicator.jsx # Chat typing animation
 │   ├── UploadConfirmModal.jsx # Upload confirmation
 │   └── UploadNewButton.jsx # New upload button
-├── hooks/                  # Custom React hooks
-│   └── useAppState.js      # Application state management
+
 ├── services/               # API services
 │   └── apiService.js       # Backend communication
 ├── utils/                  # Utility functions
@@ -87,18 +88,6 @@ src/
 ```
 
 ## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-# Development (uses proxy)
-VITE_API_BASE_URL=http://localhost:3000
-
-# Production (direct API calls)
-VITE_API_BASE_URL=https://ai-chat-with-pdf-backend.vercel.app
-```
 
 ### Development vs Production
 
@@ -158,9 +147,9 @@ The frontend communicates with your backend API:
 
 ### Core Endpoints
 
-- `POST /api/pdf/upload` - Upload PDF files
-- `POST /api/chat/query` - Send chat messages
-- `GET /uploads/:filename` - Serve uploaded PDF files
+- `POST /api/pdf/upload` - Upload PDF files with progress tracking
+- `POST /api/chat/query` - Send chat messages with context
+- `GET /uploads/:filename` - Serve uploaded PDF files (legacy, now using blobUrl)
 
 ### Request/Response Format
 
@@ -168,11 +157,24 @@ The frontend communicates with your backend API:
 // Upload PDF with progress tracking
 const response = await uploadPDF(file, onProgress);
 
+// Response includes:
+// {
+//   success: true,
+//   data: {
+//     fileId: "unique-id",
+//     blobUrl: "https://blob-url",
+//     originalName: "document.pdf",
+//     documentType: "research-paper",
+//     totalPages: 10,
+//     sections: 5,
+//     chunks: 50,
+//     summary: "Document summary...",
+//     suggestions: ["Question 1", "Question 2"]
+//   }
+// }
+
 // Send chat message
 const response = await sendChatMessage(message, fileId, chatHistory);
-
-// Get PDF URL for viewing
-const pdfUrl = getPDFUrl(filename);
 ```
 
 ## 🎨 UI Components
@@ -205,24 +207,24 @@ const pdfUrl = getPDFUrl(filename);
 ```javascript
 import * as pdfjsLib from "pdfjs-dist";
 
-// Configure worker from CDN
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Configure worker from local file
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 ```
 
 ### State Management
 
-Uses custom hooks for state management:
+Uses component-level state management:
 
-- `useAppState.js` - Global application state
 - Component-level state for UI interactions
 - Persistent state for user preferences
+- Centralized state in App.jsx for PDF management
 
 ### Performance Optimizations
 
 - **Lazy Loading**: Components load on demand
 - **Memory Management**: Proper cleanup of PDF objects
 - **Bundle Splitting**: Optimized build with code splitting
-- **CDN Resources**: External resources for faster loading
+- **Local Worker**: PDF.js worker served locally for reliability
 
 ## 🐛 Troubleshooting
 
@@ -285,6 +287,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Vite](https://vitejs.dev/) - Build tool
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [Lucide React](https://lucide.dev/) - Icons
+
+## 📦 Dependencies
+
+### Core Dependencies
+
+- **React 19** - UI framework
+- **Vite 5** - Build tool and dev server
+- **Tailwind CSS** - Styling framework
+- **PDF.js** - PDF rendering library
+- **Axios** - HTTP client
+- **Lucide React** - Icon library
+
+### Development Dependencies
+
+- **ESLint** - Code linting
+- **PostCSS** - CSS processing
+- **TypeScript types** - Type definitions
 
 ## 📞 Support
 

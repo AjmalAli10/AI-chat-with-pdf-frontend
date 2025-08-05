@@ -51,7 +51,7 @@ const PDFUpload = ({ onUploadSuccess }) => {
       clearTimeout(timeoutId);
 
       if (result.success) {
-        onUploadSuccess(result.fileId, result.fileName);
+        onUploadSuccess(result.fileId, null, result.blobUrl);
       } else if (result.aborted) {
         // Upload was aborted, don't show error
         return;
