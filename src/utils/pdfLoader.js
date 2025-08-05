@@ -27,22 +27,28 @@ export const configurePDFWorker = () => {
       );
       log(`Current URL: ${window.location.href}`);
 
-      // Use local file approach for both development and production
-      // This avoids CDN issues and Cloudflare Access redirects
-      const workerSrc = "/pdf.worker.min.js";
-      pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-      log(`PDF worker configured: ${workerSrc}`);
+      // Use jsDelivr CDN for production (more reliable than cdnjs)
+      // Use local file for development
+      if (import.meta.env.DEV) {
+        const workerSrc = "/pdf.worker.min.js";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for development: ${workerSrc}`);
+      } else {
+        const workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        log(`PDF worker configured for production: ${workerSrc}`);
+      }
 
       pdfWorkerConfigured = true;
       log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
-      // Try alternative CDN if local file fails
+      // Try local file as fallback
       try {
-        const fallbackSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+        const fallbackSrc = "/pdf.worker.min.js";
         pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
         pdfWorkerConfigured = true;
-        log(`PDF worker configured with unpkg fallback: ${fallbackSrc}`);
+        log(`PDF worker configured with local file fallback: ${fallbackSrc}`);
       } catch (fallbackError) {
         log(
           "PDF worker fallback also failed: " + fallbackError.message,

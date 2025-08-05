@@ -7,10 +7,27 @@
     {
       "source": "/uploads/:path*",
       "destination": "https://ai-chat-with-pdf-backend.vercel.app/uploads/:path*"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/pdf.worker.min.js",
+      "dest": "/pdf.worker.min.js",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/vite.svg",
+      "dest": "/vite.svg"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "env": {
