@@ -21,7 +21,23 @@ const removeConsolePlugin = () => {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), removeConsolePlugin()],
+  base: "/",
+  build: {
+    outDir: "dist",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          pdfjs: ["pdfjs-dist"],
+          vendor: ["react", "react-dom"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    minify: "esbuild",
+    target: "es2015",
+  },
   server: {
+    historyApiFallback: true,
     proxy: {
       "^/api/.*": {
         target: "https://ai-chat-with-pdf-backend.vercel.app",
@@ -36,19 +52,6 @@ export default defineConfig({
         rewrite: (path) => path,
       },
     },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          pdfjs: ["pdfjs-dist"],
-          vendor: ["react", "react-dom"],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
-    minify: "esbuild",
-    target: "es2015",
   },
   optimizeDeps: {
     include: ["pdfjs-dist"],

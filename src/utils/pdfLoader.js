@@ -19,13 +19,13 @@ const log = (message, type = "log") => {
 export const configurePDFWorker = () => {
   if (typeof window !== "undefined" && !pdfWorkerConfigured) {
     try {
-      // The worker file is in the public directory and will be served from the root
+      // Try local file first (works with improved Vercel config), fallback to CDN
       pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
       pdfWorkerConfigured = true;
-      log("PDF worker configured successfully");
+      log("PDF worker configured with local file");
     } catch (error) {
-      log("PDF worker configuration failed: " + error.message, "error");
-      // Fallback to CDN if local configuration fails
+      log("PDF worker local file failed: " + error.message, "error");
+      // Fallback to CDN if local file fails
       try {
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
         pdfWorkerConfigured = true;
