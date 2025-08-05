@@ -27,32 +27,25 @@ export const configurePDFWorker = () => {
       );
       log(`Current URL: ${window.location.href}`);
 
-      // Force configure the worker before any PDF operations
-      if (import.meta.env.DEV) {
-        // Development: use local file from public directory
-        const workerSrc = "/pdf.worker.min.js";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        log(`PDF worker configured for development: ${workerSrc}`);
-      } else {
-        // Production: use CDN to avoid static file serving issues
-        const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        log(`PDF worker configured for production: ${workerSrc}`);
-      }
+      // Use local file approach for both development and production
+      // This avoids CDN issues and Cloudflare Access redirects
+      const workerSrc = "/pdf.worker.min.js";
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+      log(`PDF worker configured: ${workerSrc}`);
+
       pdfWorkerConfigured = true;
       log("PDF worker configured successfully");
     } catch (error) {
       log("PDF worker configuration failed: " + error.message, "error");
-      // Fallback to local file if CDN fails
+      // Try alternative CDN if local file fails
       try {
-        const fallbackSrc = "/pdf.worker.min.js";
+        const fallbackSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
         pdfjsLib.GlobalWorkerOptions.workerSrc = fallbackSrc;
         pdfWorkerConfigured = true;
-        log(`PDF worker configured with local file fallback: ${fallbackSrc}`);
+        log(`PDF worker configured with unpkg fallback: ${fallbackSrc}`);
       } catch (fallbackError) {
         log(
-          "PDF worker local file fallback also failed: " +
-            fallbackError.message,
+          "PDF worker fallback also failed: " + fallbackError.message,
           "error"
         );
       }
